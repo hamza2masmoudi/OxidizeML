@@ -1,0 +1,9 @@
+[package]
+name = "oxidize-ml-cli"
+version = "0.3.0"
+edition = "2021"
+description = "Modern interactive CLI dashboard for OxidizeML"
+
+[dependencies]
+crossterm = "0.27"
+oxidize-ml = { path = "../crates/oxidize-ml" }

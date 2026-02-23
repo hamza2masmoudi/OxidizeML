@@ -19,7 +19,7 @@ members = [
     "crates/oxidize-ml-data",
     "crates/oxidize-ml-io",
     "crates/oxidize-ml-datasets",
-    "crates/oxidize-ml-pipeline",
+    "crates/oxidize-ml-pipeline", "oxidize-ml-cli",
 ]
 
 [workspace.dependencies]
