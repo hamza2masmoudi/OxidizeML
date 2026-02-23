@@ -1,0 +1,10 @@
+[package]
+name = "oxidize-ml-linear"
+version = "0.1.0"
+edition = "2021"
+description = "Linear models for OxidizeML"
+
+[dependencies]
+oxidize-ml-core = { path = "../oxidize-ml-core" }
+oxidize-ml-linalg = { path = "../oxidize-ml-linalg" }
+rand = { workspace = true }

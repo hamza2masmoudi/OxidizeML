@@ -1,0 +1,26 @@
+[package]
+name = "oxidize-ml"
+version = "0.1.0"
+edition = "2021"
+description = "OxidizeML — A production-grade Machine Learning library in Rust 🦀"
+readme = "../../README.md"
+
+[dependencies]
+oxidize-ml-core = { path = "../oxidize-ml-core" }
+oxidize-ml-linalg = { path = "../oxidize-ml-linalg" }
+oxidize-ml-autodiff = { path = "../oxidize-ml-autodiff" }
+oxidize-ml-preprocessing = { path = "../oxidize-ml-preprocessing" }
+oxidize-ml-linear = { path = "../oxidize-ml-linear" }
+oxidize-ml-tree = { path = "../oxidize-ml-tree" }
+oxidize-ml-cluster = { path = "../oxidize-ml-cluster" }
+oxidize-ml-neighbors = { path = "../oxidize-ml-neighbors" }
+oxidize-ml-svm = { path = "../oxidize-ml-svm" }
+oxidize-ml-naive-bayes = { path = "../oxidize-ml-naive-bayes" }
+oxidize-ml-metrics = { path = "../oxidize-ml-metrics" }
+oxidize-ml-nn = { path = "../oxidize-ml-nn" }
+oxidize-ml-optim = { path = "../oxidize-ml-optim" }
+oxidize-ml-loss = { path = "../oxidize-ml-loss" }
+oxidize-ml-data = { path = "../oxidize-ml-data" }
+oxidize-ml-io = { path = "../oxidize-ml-io" }
+oxidize-ml-datasets = { path = "../oxidize-ml-datasets" }
+oxidize-ml-pipeline = { path = "../oxidize-ml-pipeline" }

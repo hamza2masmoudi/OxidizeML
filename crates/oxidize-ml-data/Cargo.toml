@@ -1,0 +1,9 @@
+[package]
+name = "oxidize-ml-data"
+version = "0.1.0"
+edition = "2021"
+description = "Data loading utilities for OxidizeML"
+
+[dependencies]
+oxidize-ml-core = { path = "../oxidize-ml-core" }
+rand = { workspace = true }

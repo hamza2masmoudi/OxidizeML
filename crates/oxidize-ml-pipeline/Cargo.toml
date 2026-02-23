@@ -1,0 +1,8 @@
+[package]
+name = "oxidize-ml-pipeline"
+version = "0.1.0"
+edition = "2021"
+description = "ML pipeline API for OxidizeML"
+
+[dependencies]
+oxidize-ml-core = { path = "../oxidize-ml-core" }

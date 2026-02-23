@@ -1,0 +1,8 @@
+[package]
+name = "oxidize-ml-metrics"
+version = "0.1.0"
+edition = "2021"
+description = "Evaluation metrics for OxidizeML"
+
+[dependencies]
+oxidize-ml-core = { path = "../oxidize-ml-core" }

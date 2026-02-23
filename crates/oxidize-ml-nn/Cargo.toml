@@ -1,0 +1,10 @@
+[package]
+name = "oxidize-ml-nn"
+version = "0.1.0"
+edition = "2021"
+description = "Neural network layers for OxidizeML"
+
+[dependencies]
+oxidize-ml-core = { path = "../oxidize-ml-core" }
+oxidize-ml-autodiff = { path = "../oxidize-ml-autodiff" }
+rand = { workspace = true }

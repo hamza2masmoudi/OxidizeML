@@ -1,0 +1,8 @@
+[package]
+name = "oxidize-ml-neighbors"
+version = "0.1.0"
+edition = "2021"
+description = "K-Nearest Neighbors for OxidizeML"
+
+[dependencies]
+oxidize-ml-core = { path = "../oxidize-ml-core" }

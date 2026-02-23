@@ -1,0 +1,9 @@
+[package]
+name = "oxidize-ml-svm"
+version = "0.1.0"
+edition = "2021"
+description = "Support Vector Machines for OxidizeML"
+
+[dependencies]
+oxidize-ml-core = { path = "../oxidize-ml-core" }
+rand = { workspace = true }

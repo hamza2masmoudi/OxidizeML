@@ -1,0 +1,10 @@
+[package]
+name = "oxidize-ml-core"
+version = "0.1.0"
+edition = "2021"
+description = "Core tensor engine for OxidizeML"
+
+[dependencies]
+rand = { workspace = true }
+thiserror = { workspace = true }
+serde = { workspace = true }

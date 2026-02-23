@@ -1,0 +1,9 @@
+[package]
+name = "oxidize-ml-optim"
+version = "0.1.0"
+edition = "2021"
+description = "Optimizers for OxidizeML"
+
+[dependencies]
+oxidize-ml-core = { path = "../oxidize-ml-core" }
+oxidize-ml-autodiff = { path = "../oxidize-ml-autodiff" }

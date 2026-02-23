@@ -1,0 +1,1 @@
+/Users/hamza/ML_in\ rust/target/debug/libferris_ml_core.rlib: /Users/hamza/ML_in\ rust/crates/ferris-ml-core/src/dtype.rs /Users/hamza/ML_in\ rust/crates/ferris-ml-core/src/error.rs /Users/hamza/ML_in\ rust/crates/ferris-ml-core/src/lib.rs /Users/hamza/ML_in\ rust/crates/ferris-ml-core/src/shape.rs /Users/hamza/ML_in\ rust/crates/ferris-ml-core/src/tensor.rs

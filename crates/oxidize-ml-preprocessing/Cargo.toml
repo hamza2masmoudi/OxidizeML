@@ -1,0 +1,9 @@
+[package]
+name = "oxidize-ml-preprocessing"
+version = "0.1.0"
+edition = "2021"
+description = "Data preprocessing for OxidizeML"
+
+[dependencies]
+oxidize-ml-core = { path = "../oxidize-ml-core" }
+rand = { workspace = true }

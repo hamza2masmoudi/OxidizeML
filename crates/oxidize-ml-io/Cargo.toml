@@ -1,0 +1,11 @@
+[package]
+name = "oxidize-ml-io"
+version = "0.1.0"
+edition = "2021"
+description = "I/O utilities for OxidizeML"
+
+[dependencies]
+oxidize-ml-core = { path = "../oxidize-ml-core" }
+csv = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }

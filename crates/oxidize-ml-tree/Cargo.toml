@@ -1,0 +1,10 @@
+[package]
+name = "oxidize-ml-tree"
+version = "0.1.0"
+edition = "2021"
+description = "Decision tree and ensemble models for OxidizeML"
+
+[dependencies]
+oxidize-ml-core = { path = "../oxidize-ml-core" }
+rand = { workspace = true }
+rayon = { workspace = true }

@@ -1,0 +1,8 @@
+[package]
+name = "oxidize-ml-naive-bayes"
+version = "0.1.0"
+edition = "2021"
+description = "Naive Bayes classifiers for OxidizeML"
+
+[dependencies]
+oxidize-ml-core = { path = "../oxidize-ml-core" }

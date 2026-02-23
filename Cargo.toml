@@ -1,0 +1,32 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/oxidize-ml",
+    "crates/oxidize-ml-core",
+    "crates/oxidize-ml-linalg",
+    "crates/oxidize-ml-autodiff",
+    "crates/oxidize-ml-preprocessing",
+    "crates/oxidize-ml-linear",
+    "crates/oxidize-ml-tree",
+    "crates/oxidize-ml-cluster",
+    "crates/oxidize-ml-neighbors",
+    "crates/oxidize-ml-svm",
+    "crates/oxidize-ml-naive-bayes",
+    "crates/oxidize-ml-metrics",
+    "crates/oxidize-ml-nn",
+    "crates/oxidize-ml-optim",
+    "crates/oxidize-ml-loss",
+    "crates/oxidize-ml-data",
+    "crates/oxidize-ml-io",
+    "crates/oxidize-ml-datasets",
+    "crates/oxidize-ml-pipeline",
+]
+
+[workspace.dependencies]
+rand = "0.8"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+thiserror = "2"
+approx = "0.5"
+csv = "1"
+rayon = "1"
