@@ -19,11 +19,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     )?;
 
     let menu_items = vec![
-        "  🚀 Quick Start Demo      ",
-        "  🧠 Model Explorer        ",
-        "  📊 Training Dashboard    ",
-        "  ⚙️  Settings & Config    ",
-        "  ❌ Exit                  ",
+        "  Quick Start Demo      ",
+        "  Model Explorer        ",
+        "  Training Dashboard    ",
+        "  Settings & Config     ",
+        "  Exit                  ",
     ];
 
     let mut selected_index = 0;
@@ -35,11 +35,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             cursor::MoveTo(0, 2),
             SetForegroundColor(Color::Cyan),
             Print(r#"
-   ____        _     ___ __         __  __ _    
-  / __ \__  __(_)___/ (_) /_  ___  /  |/  / /   
- / / / / / / / / __  / / __ \/ _ \/ /|_/ / /    
-/ /_/ / /_/ / / /_/ / / / / /  __/ /  / / /___  
-\____/\__,_/_/\__,_/_/_/ /_/\___/_/  /_/_____/  
+   ____       _     ___          __  __ _      
+  / __ \_  __(_)___/ (_)_______ |  \/  | |     
+ / /_/ / |/_/ / __  / /_  / _ \ | \  / | |     
+ \____/_/|_/_/\__,_/_/ /_/\___/ |_|  |_|______|
             "#),
             ResetColor,
             Print("\n\n"),
