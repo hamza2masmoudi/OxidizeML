@@ -1,0 +1,11 @@
+/Users/hamza/ML_in rust/oxidize-ml-cli/target/debug/deps/libopenblas_build-37f4dfc494bcabcf.rmeta: /Users/hamza/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/openblas-build-0.10.14/src/lib.rs /Users/hamza/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/openblas-build-0.10.14/src/build.rs /Users/hamza/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/openblas-build-0.10.14/src/check.rs /Users/hamza/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/openblas-build-0.10.14/src/download.rs /Users/hamza/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/openblas-build-0.10.14/src/error.rs
+
+/Users/hamza/ML_in rust/oxidize-ml-cli/target/debug/deps/libopenblas_build-37f4dfc494bcabcf.rlib: /Users/hamza/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/openblas-build-0.10.14/src/lib.rs /Users/hamza/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/openblas-build-0.10.14/src/build.rs /Users/hamza/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/openblas-build-0.10.14/src/check.rs /Users/hamza/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/openblas-build-0.10.14/src/download.rs /Users/hamza/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/openblas-build-0.10.14/src/error.rs
+
+/Users/hamza/ML_in rust/oxidize-ml-cli/target/debug/deps/openblas_build-37f4dfc494bcabcf.d: /Users/hamza/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/openblas-build-0.10.14/src/lib.rs /Users/hamza/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/openblas-build-0.10.14/src/build.rs /Users/hamza/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/openblas-build-0.10.14/src/check.rs /Users/hamza/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/openblas-build-0.10.14/src/download.rs /Users/hamza/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/openblas-build-0.10.14/src/error.rs
+
+/Users/hamza/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/openblas-build-0.10.14/src/lib.rs:
+/Users/hamza/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/openblas-build-0.10.14/src/build.rs:
+/Users/hamza/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/openblas-build-0.10.14/src/check.rs:
+/Users/hamza/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/openblas-build-0.10.14/src/download.rs:
+/Users/hamza/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/openblas-build-0.10.14/src/error.rs:

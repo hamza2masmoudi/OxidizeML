@@ -4,6 +4,11 @@ version = "0.3.0"
 edition = "2021"
 description = "Modern interactive CLI dashboard for OxidizeML"
 
+[workspace]
+
 [dependencies]
 crossterm = "0.27"
-oxidize-ml = { path = "../crates/oxidize-ml" }
+oximl-core = { path = "../crates-v2/oximl-core" }
+oximl-autodiff = { path = "../crates-v2/oximl-autodiff" }
+oximl-nn = { path = "../crates-v2/oximl-nn" }
+oximl-optim = { path = "../crates-v2/oximl-optim" }
