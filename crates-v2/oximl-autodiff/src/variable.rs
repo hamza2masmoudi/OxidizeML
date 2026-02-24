@@ -37,6 +37,20 @@ impl Variable {
         Ok(Variable { node_id, data: out_data, graph: self.graph.clone() })
     }
 
+    /// Element-wise division.
+    pub fn div(&self, rhs: &Variable) -> TensorResult<Variable> {
+        let out_data = (&self.data / &rhs.data)?;
+        let requires_grad = self.get_node().requires_grad || rhs.get_node().requires_grad;
+        
+        let node_id = self.graph.push_node(
+            Op::Div(self.node_id, rhs.node_id),
+            out_data.clone(),
+            requires_grad,
+        );
+
+        Ok(Variable { node_id, data: out_data, graph: self.graph.clone() })
+    }
+
     /// Matrix multiplication.
     pub fn matmul(&self, rhs: &Variable) -> TensorResult<Variable> {
         let out_data = self.data.matmul(&rhs.data)?;
@@ -80,6 +94,30 @@ impl Variable {
         let out_data = self.data.softmax()?;
         let requires_grad = self.get_node().requires_grad;
         let node_id = self.graph.push_node(Op::Softmax(self.node_id), out_data.clone(), requires_grad);
+        Ok(Variable { node_id, data: out_data, graph: self.graph.clone() })
+    }
+
+    /// ReLU
+    pub fn relu(&self) -> TensorResult<Variable> {
+        let out_data = self.data.relu()?;
+        let requires_grad = self.get_node().requires_grad;
+        let node_id = self.graph.push_node(Op::Relu(self.node_id), out_data.clone(), requires_grad);
+        Ok(Variable { node_id, data: out_data, graph: self.graph.clone() })
+    }
+
+    /// Exponential
+    pub fn exp(&self) -> TensorResult<Variable> {
+        let out_data = self.data.exp()?;
+        let requires_grad = self.get_node().requires_grad;
+        let node_id = self.graph.push_node(Op::Exp(self.node_id), out_data.clone(), requires_grad);
+        Ok(Variable { node_id, data: out_data, graph: self.graph.clone() })
+    }
+
+    /// Natural Logarithm
+    pub fn ln(&self) -> TensorResult<Variable> {
+        let out_data = self.data.ln()?;
+        let requires_grad = self.get_node().requires_grad;
+        let node_id = self.graph.push_node(Op::Ln(self.node_id), out_data.clone(), requires_grad);
         Ok(Variable { node_id, data: out_data, graph: self.graph.clone() })
     }
 

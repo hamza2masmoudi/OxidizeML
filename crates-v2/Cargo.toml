@@ -2,7 +2,6 @@
 resolver = "2"
 members = [ "oximl-autodiff",
     "oximl-core", "oximl-data", "oximl-nn", "oximl-optim",
-    "../oxidize-ml-cli",
 ]
 
 [workspace.dependencies]

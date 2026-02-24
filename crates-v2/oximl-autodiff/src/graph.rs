@@ -13,6 +13,10 @@ pub enum Op {
     Transpose(NodeId),
     Reshape(NodeId),
     Softmax(NodeId),
+    Relu(NodeId),
+    Exp(NodeId),
+    Ln(NodeId),
+    Div(NodeId, NodeId),
 }
 
 /// A node in the thread-safe computation graph.
@@ -128,6 +132,38 @@ impl Graph {
                     // Using diagonal approximation for structural pipeline
                     let grad_lhs = nodes[lhs].data.softmax_backward(&grad_i)?;
                     accumulate_grad(&mut nodes, lhs, &grad_lhs)?;
+                }
+                Op::Relu(lhs) => {
+                    let grad_lhs = nodes[lhs].data.relu_backward(&grad_i)?;
+                    accumulate_grad(&mut nodes, lhs, &grad_lhs)?;
+                }
+                Op::Exp(lhs) => {
+                    // d(e^x) = e^x * dx. The forward output is e^x.
+                    let e_x = &nodes[i].data;
+                    let grad_lhs = (e_x * &grad_i)?;
+                    accumulate_grad(&mut nodes, lhs, &grad_lhs)?;
+                }
+                Op::Ln(lhs) => {
+                    // d(ln x) = 1/x * dx
+                    let ones = Tensor::ones(nodes[lhs].data.shape(), nodes[lhs].data.dtype());
+                    let inv_x = (&ones / &nodes[lhs].data)?;
+                    let grad_lhs = (&inv_x * &grad_i)?;
+                    accumulate_grad(&mut nodes, lhs, &grad_lhs)?;
+                }
+                Op::Div(lhs, rhs) => {
+                    // d(A/B) / dA = 1/B
+                    // d(A/B) / dB = -A/B^2
+                    let ones = Tensor::ones(nodes[lhs].data.shape(), nodes[lhs].data.dtype());
+                    let inv_rhs = (&ones / &nodes[rhs].data)?;
+                    let grad_lhs = (&grad_i * &inv_rhs)?;
+                    
+                    let rhs_sq = (&nodes[rhs].data * &nodes[rhs].data)?;
+                    let neg_lhs = nodes[lhs].data.scalar_mul(-1.0)?;
+                    let min_a_b_sq = (&neg_lhs / &rhs_sq)?;
+                    let grad_rhs = (&grad_i * &min_a_b_sq)?;
+                    
+                    accumulate_grad(&mut nodes, lhs, &grad_lhs)?;
+                    accumulate_grad(&mut nodes, rhs, &grad_rhs)?;
                 }
                 Op::Leaf => {}
             }

@@ -39,6 +39,24 @@ impl Mul for &Tensor {
     }
 }
 
+impl Div for &Tensor {
+    type Output = TensorResult<Tensor>;
+
+    fn div(self, rhs: Self) -> Self::Output {
+        if self.dtype() != rhs.dtype() {
+            return Err(TensorError::TypeMismatch{ expected: self.dtype(), got: rhs.dtype() });
+        }
+        match (self, rhs) {
+            (Tensor::Float32(a), Tensor::Float32(b)) => Ok(Tensor::Float32((a / b).into_shared())),
+            (Tensor::Float64(a), Tensor::Float64(b)) => Ok(Tensor::Float64((a / b).into_shared())),
+            (Tensor::Int32(a), Tensor::Int32(b)) => Ok(Tensor::Int32((a / b).into_shared())),
+            (Tensor::Int64(a), Tensor::Int64(b)) => Ok(Tensor::Int64((a / b).into_shared())),
+            (Tensor::UInt8(a), Tensor::UInt8(b)) => Ok(Tensor::UInt8((a / b).into_shared())),
+            _ => unreachable!(),
+        }
+    }
+}
+
 impl Tensor {
     /// Matrix multiplication. Extremely fast due to `ndarray` backend hitting BLAS directly.
     /// Operates on 2D Tensors.
@@ -77,6 +95,60 @@ impl Tensor {
                 Ok(Tensor::Int64(res))
             }
             _ => Err(TensorError::InvalidOperation("Matmul not supported for this dtype".into())),
+        }
+    }
+
+    /// Compute ReLU element-wise
+    pub fn relu(&self) -> TensorResult<Tensor> {
+        match self {
+            Tensor::Float32(a) => {
+                let out = a.mapv(|x| x.max(0.0));
+                Ok(Tensor::Float32(out.into_shared()))
+            }
+            Tensor::Float64(a) => {
+                let out = a.mapv(|x| x.max(0.0));
+                Ok(Tensor::Float64(out.into_shared()))
+            }
+            _ => Err(TensorError::InvalidOperation("ReLU requires float dtype".into())),
+        }
+    }
+
+    /// Compute ReLU backward pass element-wise (1 if x > 0 else 0) * grad
+    pub fn relu_backward(&self, grad: &Tensor) -> TensorResult<Tensor> {
+        match (self, grad) {
+            (Tensor::Float32(a), Tensor::Float32(g)) => {
+                let mut out = g.to_owned();
+                out.zip_mut_with(a, |out_val, x_val| {
+                    *out_val *= if *x_val > 0.0 { 1.0 } else { 0.0 };
+                });
+                Ok(Tensor::Float32(out.into_shared()))
+            }
+            (Tensor::Float64(a), Tensor::Float64(g)) => {
+                let mut out = g.to_owned();
+                out.zip_mut_with(a, |out_val, x_val| {
+                    *out_val *= if *x_val > 0.0 { 1.0 } else { 0.0 };
+                });
+                Ok(Tensor::Float64(out.into_shared()))
+            }
+            _ => Err(TensorError::InvalidOperation("ReLU backward requires float matching dtype".into())),
+        }
+    }
+
+    /// Compute Exponential element-wise
+    pub fn exp(&self) -> TensorResult<Tensor> {
+        match self {
+            Tensor::Float32(a) => Ok(Tensor::Float32(a.mapv(|x| x.exp()).into_shared())),
+            Tensor::Float64(a) => Ok(Tensor::Float64(a.mapv(|x| x.exp()).into_shared())),
+            _ => Err(TensorError::InvalidOperation("Exp requires float dtype".into())),
+        }
+    }
+
+    /// Compute Natural Logarithm element-wise
+    pub fn ln(&self) -> TensorResult<Tensor> {
+        match self {
+            Tensor::Float32(a) => Ok(Tensor::Float32(a.mapv(|x| x.ln()).into_shared())),
+            Tensor::Float64(a) => Ok(Tensor::Float64(a.mapv(|x| x.ln()).into_shared())),
+            _ => Err(TensorError::InvalidOperation("Ln requires float dtype".into())),
         }
     }
 
