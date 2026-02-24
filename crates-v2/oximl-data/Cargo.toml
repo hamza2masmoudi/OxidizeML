@@ -5,6 +5,7 @@ edition = "2021"
 
 [dependencies]
 oximl-core = { path = "../oximl-core" }
+oximl-autodiff = { path = "../oximl-autodiff" }
 csv = "1.3"
 ndarray = "0.15"
 thiserror = { workspace = true }

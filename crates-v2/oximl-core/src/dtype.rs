@@ -1,5 +1,7 @@
+use serde::{Serialize, Deserialize};
+
 /// Dynamic Data Types for Tensors.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub enum DType {
     Float32,
     Float64,

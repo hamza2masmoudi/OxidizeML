@@ -6,3 +6,4 @@ edition = "2021"
 [dependencies]
 oximl-core = { path = "../oximl-core" }
 oximl-autodiff = { path = "../oximl-autodiff" }
+bincode = "1.3.3"

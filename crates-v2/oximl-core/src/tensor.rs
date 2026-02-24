@@ -1,5 +1,6 @@
 use ndarray::{ArrayD, ArcArray, IxDyn, LinalgScalar};
 use thiserror::Error;
+use serde::{Serialize, Deserialize};
 use crate::DType;
 
 #[derive(Error, Debug)]
@@ -17,7 +18,7 @@ pub type TensorResult<T> = Result<T, TensorError>;
 /// A dynamic-typed Tensor, powered by `ndarray`.
 /// Uses `ArcArray` internally to allow incredibly fast cloning (pointer sharing)
 /// and zero-copy views, mirroring PyTorch's architecture.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum Tensor {
     Float32(ArcArray<f32, IxDyn>),
     Float64(ArcArray<f64, IxDyn>),
