@@ -1,5 +1,6 @@
 use oximl_core::{Tensor, TensorResult};
 use crate::graph::{Graph, NodeId, Op};
+use crate::no_grad::is_grad_enabled;
 use std::sync::Arc;
 
 /// A differentiable variable backed by the thread-safe computation graph.
@@ -26,6 +27,12 @@ impl Variable {
     /// Element-wise addition.
     pub fn add(&self, rhs: &Variable) -> TensorResult<Variable> {
         let out_data = (&self.data + &rhs.data)?;
+        
+        if !is_grad_enabled() {
+            // Detach entirely - fake node zero, data correct, empty graph pointer
+            return Ok(Variable { node_id: 0, data: out_data, graph: self.graph.clone() });
+        }
+
         let requires_grad = self.get_node().requires_grad || rhs.get_node().requires_grad;
         
         let node_id = self.graph.push_node(
@@ -40,6 +47,11 @@ impl Variable {
     /// Element-wise division.
     pub fn div(&self, rhs: &Variable) -> TensorResult<Variable> {
         let out_data = (&self.data / &rhs.data)?;
+        
+        if !is_grad_enabled() {
+            return Ok(Variable { node_id: 0, data: out_data, graph: self.graph.clone() });
+        }
+
         let requires_grad = self.get_node().requires_grad || rhs.get_node().requires_grad;
         
         let node_id = self.graph.push_node(
@@ -54,8 +66,11 @@ impl Variable {
     /// Matrix multiplication.
     pub fn matmul(&self, rhs: &Variable) -> TensorResult<Variable> {
         let out_data = self.data.matmul(&rhs.data)?;
-        let requires_grad = self.get_node().requires_grad || rhs.get_node().requires_grad;
+        if !is_grad_enabled() {
+            return Ok(Variable { node_id: 0, data: out_data, graph: self.graph.clone() });
+        }
         
+        let requires_grad = self.get_node().requires_grad || rhs.get_node().requires_grad;
         let node_id = self.graph.push_node(
             Op::MatMul(self.node_id, rhs.node_id),
             out_data.clone(),
@@ -68,6 +83,9 @@ impl Variable {
     /// Transpose
     pub fn t(&self) -> Variable {
         let out_data = self.data.t();
+        if !is_grad_enabled() {
+            return Variable { node_id: 0, data: out_data, graph: self.graph.clone() };
+        }
         let requires_grad = self.get_node().requires_grad;
         let node_id = self.graph.push_node(Op::Transpose(self.node_id), out_data.clone(), requires_grad);
         Variable { node_id, data: out_data, graph: self.graph.clone() }
@@ -76,6 +94,9 @@ impl Variable {
     /// Reshape
     pub fn reshape(&self, shape: &[usize]) -> TensorResult<Variable> {
         let out_data = self.data.reshape(shape)?;
+        if !is_grad_enabled() {
+            return Ok(Variable { node_id: 0, data: out_data, graph: self.graph.clone() });
+        }
         let requires_grad = self.get_node().requires_grad;
         let node_id = self.graph.push_node(Op::Reshape(self.node_id), out_data.clone(), requires_grad);
         Ok(Variable { node_id, data: out_data, graph: self.graph.clone() })
@@ -84,6 +105,9 @@ impl Variable {
     /// Scalar multiplication
     pub fn scalar_mul(&self, scalar: f64) -> TensorResult<Variable> {
         let out_data = self.data.scalar_mul(scalar)?;
+        if !is_grad_enabled() {
+            return Ok(Variable { node_id: 0, data: out_data, graph: self.graph.clone() });
+        }
         let requires_grad = self.get_node().requires_grad;
         let node_id = self.graph.push_node(Op::ScalarMul(self.node_id, scalar), out_data.clone(), requires_grad);
         Ok(Variable { node_id, data: out_data, graph: self.graph.clone() })
@@ -92,6 +116,9 @@ impl Variable {
     /// Softmax
     pub fn softmax(&self) -> TensorResult<Variable> {
         let out_data = self.data.softmax()?;
+        if !is_grad_enabled() {
+            return Ok(Variable { node_id: 0, data: out_data, graph: self.graph.clone() });
+        }
         let requires_grad = self.get_node().requires_grad;
         let node_id = self.graph.push_node(Op::Softmax(self.node_id), out_data.clone(), requires_grad);
         Ok(Variable { node_id, data: out_data, graph: self.graph.clone() })
@@ -100,6 +127,9 @@ impl Variable {
     /// ReLU
     pub fn relu(&self) -> TensorResult<Variable> {
         let out_data = self.data.relu()?;
+        if !is_grad_enabled() {
+            return Ok(Variable { node_id: 0, data: out_data, graph: self.graph.clone() });
+        }
         let requires_grad = self.get_node().requires_grad;
         let node_id = self.graph.push_node(Op::Relu(self.node_id), out_data.clone(), requires_grad);
         Ok(Variable { node_id, data: out_data, graph: self.graph.clone() })
@@ -108,6 +138,9 @@ impl Variable {
     /// Exponential
     pub fn exp(&self) -> TensorResult<Variable> {
         let out_data = self.data.exp()?;
+        if !is_grad_enabled() {
+            return Ok(Variable { node_id: 0, data: out_data, graph: self.graph.clone() });
+        }
         let requires_grad = self.get_node().requires_grad;
         let node_id = self.graph.push_node(Op::Exp(self.node_id), out_data.clone(), requires_grad);
         Ok(Variable { node_id, data: out_data, graph: self.graph.clone() })
@@ -116,6 +149,9 @@ impl Variable {
     /// Natural Logarithm
     pub fn ln(&self) -> TensorResult<Variable> {
         let out_data = self.data.ln()?;
+        if !is_grad_enabled() {
+            return Ok(Variable { node_id: 0, data: out_data, graph: self.graph.clone() });
+        }
         let requires_grad = self.get_node().requires_grad;
         let node_id = self.graph.push_node(Op::Ln(self.node_id), out_data.clone(), requires_grad);
         Ok(Variable { node_id, data: out_data, graph: self.graph.clone() })

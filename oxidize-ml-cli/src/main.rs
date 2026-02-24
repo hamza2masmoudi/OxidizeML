@@ -9,7 +9,7 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use oximl_core::{Tensor, DType};
-use oximl_autodiff::{Graph, Variable};
+use oximl_autodiff::{Graph, Variable, with_no_grad, is_grad_enabled};
 use oximl_optim::SGD;
 use oximl_data::{load_csv_to_tensor, DataLoader};
 
@@ -150,7 +150,7 @@ fn run_training_dashboard(stdout: &mut std::io::Stdout) -> Result<(), Box<dyn st
     let features = load_csv_to_tensor("housing_features.csv").expect("Failed to load features");
     let labels = load_csv_to_tensor("housing_labels.csv").expect("Failed to load labels");
     
-    let mut dataloader = DataLoader::new(features, labels, 10).expect("Failed to make Dataloader");
+    let mut dataloader = DataLoader::new(features.clone(), labels.clone(), 10).expect("Failed to make Dataloader");
     
     // Weight param to learn. Init to ones. The features have 2 columns.
     let w_data = Tensor::ones(&[2, 1], DType::Float64);
@@ -235,7 +235,40 @@ fn run_training_dashboard(stdout: &mut std::io::Stdout) -> Result<(), Box<dyn st
         cursor::MoveTo(2, 12),
         SetForegroundColor(Color::Green),
         Print("Training Finished SUCCESSFULLY! Math engine verified."),
+        ResetColor
+    )?;
+    
+    // Demonstrate Inference Mode (Phase 8 Zero-Allocation)
+    execute!(
+        stdout,
         cursor::MoveTo(2, 14),
+        SetForegroundColor(Color::Magenta),
+        Print("--- Running Evaluation (Inference Mode with no_grad) ---"),
+        ResetColor
+    )?;
+    
+    let w_eval = w.clone();
+    let x_eval = features.slice(0, 1).unwrap();
+    
+    with_no_grad(|| {
+        let x_inf = Variable::input(x_eval, graph.clone());
+        let pred_inf = x_inf.matmul(&w_eval).unwrap();
+        
+        let val = extract_f64_scalar(&pred_inf.data);
+        let grad_status = is_grad_enabled();
+        
+        execute!(
+            stdout,
+            cursor::MoveTo(2, 16),
+            SetForegroundColor(Color::Cyan),
+            Print(format!("Inference Prediction: {:.4} | Graph Tracking Enabled: {} | Nodes Allocated: {}", val, grad_status, pred_inf.graph.len())),
+            ResetColor
+        ).unwrap();
+    });
+
+    execute!(
+        stdout,
+        cursor::MoveTo(2, 19),
         SetForegroundColor(Color::DarkGrey),
         Print("Press any key to return to the main menu..."),
         ResetColor

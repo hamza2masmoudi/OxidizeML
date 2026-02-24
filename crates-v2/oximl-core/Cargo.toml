@@ -6,7 +6,7 @@ edition = "2021"
 [dependencies]
 ndarray = { workspace = true, features = ["serde-1"] }
 blas-src = { workspace = true }
-openblas-src = { workspace = true }
+accelerate-src = { workspace = true }
 rand = { workspace = true }
 thiserror = { workspace = true }
 serde = { version = "1.0.228", features = ["derive"] }
