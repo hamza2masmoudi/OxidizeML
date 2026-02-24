@@ -1,0 +1,8 @@
+[package]
+name = "oximl-autodiff"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+oximl-core = { path = "../oximl-core" }
+thiserror = { workspace = true }

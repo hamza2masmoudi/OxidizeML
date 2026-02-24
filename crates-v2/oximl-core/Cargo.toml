@@ -1,0 +1,11 @@
+[package]
+name = "oximl-core"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+ndarray = { workspace = true }
+blas-src = { workspace = true }
+openblas-src = { workspace = true }
+rand = { workspace = true }
+thiserror = { workspace = true }

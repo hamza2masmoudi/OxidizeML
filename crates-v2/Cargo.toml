@@ -1,0 +1,12 @@
+[workspace]
+resolver = "2"
+members = [ "oximl-autodiff",
+    "oximl-core", "oximl-data", "oximl-nn",
+]
+
+[workspace.dependencies]
+ndarray = "0.15"
+blas-src = { version = "0.8", default-features = false }
+openblas-src = { version = "0.10", default-features = false, features = ["cblas", "system"] }
+rand = "0.8"
+thiserror = "2"
