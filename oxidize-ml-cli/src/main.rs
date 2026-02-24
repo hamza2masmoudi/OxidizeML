@@ -11,6 +11,7 @@ use std::time::Duration;
 use oximl_core::{Tensor, DType};
 use oximl_autodiff::{Graph, Variable};
 use oximl_optim::SGD;
+use oximl_data::{load_csv_to_tensor, DataLoader};
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut stdout = stdout();
@@ -145,73 +146,88 @@ fn run_training_dashboard(stdout: &mut std::io::Stdout) -> Result<(), Box<dyn st
     let mut graph = Arc::new(Graph::new());
     
     // We'll train a tiny mathematical linear projection: X @ W = Y
-    // Where X is [1, 2], W is [2, 1], and Y target is [1, 1] filled with 5.0
+    // Load synthesized structural housing dataset
+    let features = load_csv_to_tensor("housing_features.csv").expect("Failed to load features");
+    let labels = load_csv_to_tensor("housing_labels.csv").expect("Failed to load labels");
     
-    let x_data = Tensor::ones(&[1, 2], DType::Float64);
-    let x = Variable::input(x_data, graph.clone());
+    let mut dataloader = DataLoader::new(features, labels, 10).expect("Failed to make Dataloader");
     
-    // Weight param to learn. Init to ones.
+    // Weight param to learn. Init to ones. The features have 2 columns.
     let w_data = Tensor::ones(&[2, 1], DType::Float64);
     let mut w = Variable::param(w_data, graph.clone());
 
-    let target = Tensor::ones(&[1, 1], DType::Float64).scalar_mul(5.0)?;
-
     let mut optimizer = SGD::new(0.01);
-    let epochs = 100;
+    let epochs = 50;
+    let total_batches = dataloader.len();
 
     execute!(
         stdout,
         cursor::MoveTo(2, 6),
         SetForegroundColor(Color::Green),
-        Print("Initialization Complete. Beginning Optimization Loop..."),
+        Print("DataLoader configured. Beginning Batch Loop..."),
         ResetColor
     )?;
 
     // Live Training Loop
     for epoch in 0..=epochs {
-        // Forward Pass: pred = X @ W
-        let pred = x.matmul(&w)?;
+        dataloader.reset();
         
-        // Compute Mean Squared Error Loss mathematically
-        // For structural CLI demo: loss = (pred - target) * (pred - target)
-        // Let's break it down into explicit graph steps
-        let minus_target = target.scalar_mul(-1.0)?;
-        let neg_t_var = Variable::input(minus_target, graph.clone());
-        
-        let diff = pred.add(&neg_t_var)?;
-        let loss = diff.matmul(&diff.t())?;
+        let mut sum_loss = 0.0;
 
-        // Extract scalar for visualization
-        let loss_val = extract_f64_scalar(&loss.data);
+        for (b_idx, (batch_x, batch_y)) in dataloader.by_ref().enumerate() {
+            // Attach inputs/targets to the current Graph Tape
+            let x = Variable::input(batch_x, graph.clone());
+            let target = Variable::input(batch_y, graph.clone());
 
-        if epoch % 5 == 0 {
-            let progress = (epoch as f32 / epochs as f32 * 20.0) as usize;
-            let bar = format!("[{}{}]", "█".repeat(progress), " ".repeat(20 - progress));
+            // Forward Pass: pred = X @ W
+            let pred = x.matmul(&w)?;
             
-            execute!(
-                stdout,
-                cursor::MoveTo(2, 9),
-                SetForegroundColor(Color::Cyan),
-                Print(format!("Epoch {:3}/{} {} ", epoch, epochs, bar)),
-                SetForegroundColor(Color::Yellow),
-                Print(format!("Loss: {:.6}", loss_val)),
-                ResetColor
-            )?;
-            stdout.flush()?;
-            std::thread::sleep(Duration::from_millis(50));
-        }
+            // MSE
+            let minus_target = target.data.scalar_mul(-1.0)?;
+            let neg_t_var = Variable::input(minus_target, graph.clone());
+            let diff = pred.add(&neg_t_var)?;
+            
+            // To properly sum the MSE across a batch visually, we do diff^T @ diff for simplicty in UI
+            let loss = diff.t().matmul(&diff)?;
 
-        // Backward Pass
-        loss.backward()?;
-        let mut w_leaf = w.clone();
-        
-        // Optimizer Step (w = w - lr * dL/dw)
-        optimizer.step(&mut [w_leaf.clone()])?;
-        
-        // Graph cleanup for next pass
-        graph = Arc::new(Graph::new());
-        // Re-attach variables to new clean tape
-        w = Variable::param(w_leaf.data.clone(), graph.clone());
+            let batch_loss_val = extract_f64_scalar(&loss.data);
+            sum_loss += batch_loss_val;
+
+            // Backward Pass
+            loss.backward()?;
+            
+            // Optimizer Step
+            let mut w_leaf = w.clone();
+            optimizer.step(&mut [w_leaf.clone()])?;
+            
+            // Render Live Batches
+            if epoch % 5 == 0 {
+                let batch_progress = (b_idx as f32 / total_batches as f32 * 10.0) as usize;
+                let b_bar = format!("[{}{}]", "#".repeat(batch_progress), "-".repeat(10 - batch_progress));
+                
+                let epoch_progress = (epoch as f32 / epochs as f32 * 20.0) as usize;
+                let e_bar = format!("[{}{}]", "█".repeat(epoch_progress), " ".repeat(20 - epoch_progress));
+                
+                execute!(
+                    stdout,
+                    cursor::MoveTo(2, 8),
+                    SetForegroundColor(Color::Cyan),
+                    Print(format!("Epoch {:3}/{} {} | ", epoch, epochs, e_bar)),
+                    SetForegroundColor(Color::DarkGrey),
+                    Print(format!("Batch {:2}/{} {}", b_idx+1, total_batches, b_bar)),
+                    cursor::MoveTo(2, 10),
+                    SetForegroundColor(Color::Yellow),
+                    Print(format!("Step Loss: {:.6}", batch_loss_val)),
+                    ResetColor
+                )?;
+                stdout.flush()?;
+                std::thread::sleep(Duration::from_millis(50));
+            }
+
+            // Cleanup Autodiff Tape for next batch to free memory, transferring trained parameters over
+            graph = Arc::new(Graph::new());
+            w = Variable::param(w_leaf.data.clone(), graph.clone());
+        }
     }
 
     execute!(

@@ -12,3 +12,4 @@ oximl-core = { path = "../crates-v2/oximl-core" }
 oximl-autodiff = { path = "../crates-v2/oximl-autodiff" }
 oximl-nn = { path = "../crates-v2/oximl-nn" }
 oximl-optim = { path = "../crates-v2/oximl-optim" }
+oximl-data = { path = "../crates-v2/oximl-data" }

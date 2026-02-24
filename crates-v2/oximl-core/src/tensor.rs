@@ -1,4 +1,4 @@
-use ndarray::{ArrayD, ArcArray, IxDyn, LinalgScalar};
+use ndarray::{s, ArrayD, ArcArray, IxDyn, LinalgScalar};
 use thiserror::Error;
 use serde::{Serialize, Deserialize};
 use crate::DType;
@@ -118,6 +118,40 @@ impl Tensor {
             Tensor::Int32(a) => Ok(Tensor::Int32(a.clone().into_shape(shape_dyn).unwrap())),
             Tensor::Int64(a) => Ok(Tensor::Int64(a.clone().into_shape(shape_dyn).unwrap())),
             Tensor::UInt8(a) => Ok(Tensor::UInt8(a.clone().into_shape(shape_dyn).unwrap())),
+        }
+    }
+
+    /// Slice a 2D Tensor along its first (outer) dimension `[start..end, :]`. This is the core operation for extracting mini-batches.
+    pub fn slice(&self, start: usize, end: usize) -> TensorResult<Self> {
+        if self.ndim() != 2 {
+            return Err(TensorError::InvalidOperation("Slice is currently only implemented for 2D batched tensors".into()));
+        }
+        let dims = self.shape();
+        if start >= end || end > dims[0] {
+            return Err(TensorError::InvalidOperation(format!("Invalid slice bounds {}..{} for dimension 0 size {}", start, end, dims[0])));
+        }
+
+        match self {
+            Tensor::Float32(a) => {
+                let sliced = a.slice(s![start..end, ..]).into_owned().into_dyn().into_shared();
+                Ok(Tensor::Float32(sliced))
+            }
+            Tensor::Float64(a) => {
+                let sliced = a.slice(s![start..end, ..]).into_owned().into_dyn().into_shared();
+                Ok(Tensor::Float64(sliced))
+            }
+            Tensor::Int32(a) => {
+                let sliced = a.slice(s![start..end, ..]).into_owned().into_dyn().into_shared();
+                Ok(Tensor::Int32(sliced))
+            }
+            Tensor::Int64(a) => {
+                let sliced = a.slice(s![start..end, ..]).into_owned().into_dyn().into_shared();
+                Ok(Tensor::Int64(sliced))
+            }
+            Tensor::UInt8(a) => {
+                let sliced = a.slice(s![start..end, ..]).into_owned().into_dyn().into_shared();
+                Ok(Tensor::UInt8(sliced))
+            }
         }
     }
 }
