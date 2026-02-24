@@ -121,4 +121,14 @@ impl Tensor {
             _ => unreachable!(),
         }
     }
+
+    /// Approximate Softmax diagonal derivative
+    pub fn softmax_backward(&self, grad: &Tensor) -> TensorResult<Tensor> {
+        // Approx: grad_in = grad * y * (1 - y)
+        let ones = Tensor::ones(self.shape(), self.dtype());
+        let minus_y = self.scalar_mul(-1.0)?;
+        let one_minus_y = (&ones + &minus_y)?;
+        let y_one_y = (self * &one_minus_y)?;
+        (&y_one_y * grad)
+    }
 }

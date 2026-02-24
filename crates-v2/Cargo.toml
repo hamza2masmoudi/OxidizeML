@@ -1,7 +1,7 @@
 [workspace]
 resolver = "2"
 members = [ "oximl-autodiff",
-    "oximl-core", "oximl-data", "oximl-nn",
+    "oximl-core", "oximl-data", "oximl-nn", "oximl-optim",
 ]
 
 [workspace.dependencies]

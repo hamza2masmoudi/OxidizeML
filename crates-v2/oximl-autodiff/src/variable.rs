@@ -86,4 +86,14 @@ impl Variable {
     fn get_node(&self) -> crate::graph::Node {
         self.graph.get_node(self.node_id).expect("Node must exist in graph")
     }
+
+    /// Run full mathematical backpropagation starting from this variable
+    pub fn backward(&self) -> TensorResult<()> {
+        self.graph.backward(self.node_id)
+    }
+
+    /// Extract the computed gradient for this variable, if it exists
+    pub fn grad(&self) -> Option<Tensor> {
+        self.get_node().grad.clone()
+    }
 }
