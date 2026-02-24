@@ -1,0 +1,12 @@
+/Users/hamza/ML_in rust/crates-v2/target/debug/deps/libsmartstring-d046ae45665ac62f.rmeta: /Users/hamza/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/smartstring-1.0.1/src/lib.rs /Users/hamza/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/smartstring-1.0.1/src/config.rs /Users/hamza/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/smartstring-1.0.1/src/marker_byte.rs /Users/hamza/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/smartstring-1.0.1/src/inline.rs /Users/hamza/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/smartstring-1.0.1/src/boxed.rs /Users/hamza/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/smartstring-1.0.1/src/casts.rs /Users/hamza/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/smartstring-1.0.1/src/iter.rs /Users/hamza/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/smartstring-1.0.1/src/ops.rs
+
+/Users/hamza/ML_in rust/crates-v2/target/debug/deps/smartstring-d046ae45665ac62f.d: /Users/hamza/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/smartstring-1.0.1/src/lib.rs /Users/hamza/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/smartstring-1.0.1/src/config.rs /Users/hamza/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/smartstring-1.0.1/src/marker_byte.rs /Users/hamza/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/smartstring-1.0.1/src/inline.rs /Users/hamza/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/smartstring-1.0.1/src/boxed.rs /Users/hamza/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/smartstring-1.0.1/src/casts.rs /Users/hamza/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/smartstring-1.0.1/src/iter.rs /Users/hamza/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/smartstring-1.0.1/src/ops.rs
+
+/Users/hamza/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/smartstring-1.0.1/src/lib.rs:
+/Users/hamza/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/smartstring-1.0.1/src/config.rs:
+/Users/hamza/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/smartstring-1.0.1/src/marker_byte.rs:
+/Users/hamza/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/smartstring-1.0.1/src/inline.rs:
+/Users/hamza/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/smartstring-1.0.1/src/boxed.rs:
+/Users/hamza/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/smartstring-1.0.1/src/casts.rs:
+/Users/hamza/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/smartstring-1.0.1/src/iter.rs:
+/Users/hamza/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/smartstring-1.0.1/src/ops.rs:

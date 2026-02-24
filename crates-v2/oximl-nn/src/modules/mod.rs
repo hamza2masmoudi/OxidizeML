@@ -14,3 +14,6 @@ pub trait Module {
 
 pub mod loss;
 pub use loss::{MSELoss, CrossEntropyLoss};
+
+pub mod nlp;
+pub mod cv;
