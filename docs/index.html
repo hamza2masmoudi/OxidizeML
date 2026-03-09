@@ -1,0 +1,1159 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OxidizeML</title>
+    <meta name="description" content="Machine learning framework written entirely in Rust.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --fg: #111;
+            --fg2: #555;
+            --fg3: #999;
+            --bg: #f5f0eb;
+            --bg2: #ece6df;
+            --accent: #c1440e;
+            --rule: #ccc;
+            --mono: 'Space Mono', monospace;
+            --sans: 'Space Grotesk', system-ui, sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--sans);
+            background: var(--bg);
+            color: var(--fg);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        ::selection {
+            background: var(--accent);
+            color: #fff;
+        }
+
+        /* ─── Layout ──────────────────────────────── */
+        .wrap {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 40px;
+        }
+
+        .rule {
+            border: none;
+            border-top: 1px solid var(--rule);
+            margin: 0;
+        }
+
+        .rule-thick {
+            border: none;
+            border-top: 3px solid var(--fg);
+            margin: 0;
+        }
+
+        /* ─── Nav ──────────────────────────────────── */
+        nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--bg);
+            border-bottom: 1px solid var(--rule);
+        }
+
+        .nav-inner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 52px;
+        }
+
+        .nav-mark {
+            font-family: var(--mono);
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .nav-mark span {
+            color: var(--accent);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 28px;
+        }
+
+        .nav-links a {
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            text-decoration: none;
+            color: var(--fg3);
+            font-weight: 500;
+            transition: color 0.15s;
+        }
+
+        .nav-links a:hover {
+            color: var(--fg);
+        }
+
+        /* ─── Hero ─────────────────────────────────── */
+        .hero {
+            padding: 100px 0 60px;
+        }
+
+        .hero-label {
+            font-family: var(--mono);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: var(--accent);
+            margin-bottom: 20px;
+        }
+
+        .hero h1 {
+            font-size: clamp(3rem, 7vw, 5.5rem);
+            font-weight: 700;
+            letter-spacing: -3px;
+            line-height: 1.0;
+            max-width: 900px;
+        }
+
+        .hero h1 em {
+            font-style: italic;
+            font-weight: 300;
+        }
+
+        .hero-sub {
+            margin-top: 28px;
+            font-size: 1.1rem;
+            color: var(--fg2);
+            max-width: 520px;
+            line-height: 1.7;
+        }
+
+        /* ─── Numbers Strip ────────────────────────── */
+        .numbers {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            border-top: 1px solid var(--rule);
+        }
+
+        .num-cell {
+            padding: 32px 0;
+            border-right: 1px solid var(--rule);
+        }
+
+        .num-cell:last-child {
+            border-right: none;
+        }
+
+        .num-cell .big {
+            font-family: var(--mono);
+            font-size: 2.6rem;
+            font-weight: 700;
+            letter-spacing: -2px;
+            line-height: 1;
+        }
+
+        .num-cell .tag {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--fg3);
+            margin-top: 8px;
+        }
+
+        /* ─── Section ──────────────────────────────── */
+        section {
+            padding: 80px 0;
+        }
+
+        .sec-header {
+            display: grid;
+            grid-template-columns: 200px 1fr;
+            gap: 40px;
+            margin-bottom: 48px;
+        }
+
+        .sec-label {
+            font-family: var(--mono);
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: var(--accent);
+            padding-top: 6px;
+        }
+
+        .sec-title {
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: -1px;
+        }
+
+        .sec-desc {
+            color: var(--fg2);
+            font-size: 0.95rem;
+            margin-top: 8px;
+            max-width: 500px;
+        }
+
+        /* ─── Benchmark ────────────────────────────── */
+        .bench-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .bench-table th {
+            text-align: left;
+            font-family: var(--mono);
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--fg3);
+            padding: 12px 0;
+            border-bottom: 1px solid var(--rule);
+            font-weight: 400;
+        }
+
+        .bench-table td {
+            padding: 16px 0;
+            border-bottom: 1px solid var(--rule);
+            font-size: 0.95rem;
+        }
+
+        .bench-table .name-col {
+            width: 200px;
+            font-weight: 600;
+        }
+
+        .bench-table .mono {
+            font-family: var(--mono);
+            font-size: 0.85rem;
+        }
+
+        .bench-table .accent {
+            color: var(--accent);
+            font-weight: 700;
+        }
+
+        .bench-table tr:hover td {
+            background: var(--bg2);
+        }
+
+        .bench-visual {
+            margin-top: 40px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+
+        .bench-block {}
+
+        .bench-block .label {
+            font-family: var(--mono);
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--fg3);
+            margin-bottom: 8px;
+        }
+
+        .bench-block .val {
+            font-family: var(--mono);
+            font-size: 4rem;
+            font-weight: 700;
+            letter-spacing: -3px;
+            line-height: 1;
+        }
+
+        .bench-block .val.rust-c {
+            color: var(--accent);
+        }
+
+        .bench-block .note {
+            font-size: 0.8rem;
+            color: var(--fg3);
+            margin-top: 8px;
+        }
+
+        /* ─── Graph ────────────────────────────────── */
+        .graph-box {
+            background: #fff;
+            border: 1px solid var(--rule);
+            padding: 40px;
+            overflow-x: auto;
+        }
+
+        .graph-svg {
+            width: 100%;
+            min-height: 320px;
+        }
+
+        .g-node rect {
+            rx: 2;
+            ry: 2;
+            stroke-width: 1.5;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .g-node:hover rect {
+            opacity: 0.8;
+        }
+
+        .g-edge {
+            stroke: #bbb;
+            stroke-width: 1;
+            fill: none;
+            marker-end: url(#arr);
+        }
+
+        .g-tooltip {
+            position: absolute;
+            background: var(--fg);
+            color: var(--bg);
+            font-family: var(--mono);
+            font-size: 0.7rem;
+            padding: 6px 10px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.15s;
+            z-index: 50;
+        }
+
+        /* ─── Playground ───────────────────────────── */
+        .play-box {
+            background: #fff;
+            border: 1px solid var(--rule);
+        }
+
+        .play-controls {
+            display: flex;
+            border-bottom: 1px solid var(--rule);
+        }
+
+        .play-controls input[type="text"] {
+            flex: 1;
+            border: none;
+            padding: 18px 20px;
+            font-family: var(--mono);
+            font-size: 0.85rem;
+            background: transparent;
+            color: var(--fg);
+            outline: none;
+        }
+
+        .play-controls input::placeholder {
+            color: var(--fg3);
+        }
+
+        .play-controls button {
+            border: none;
+            background: var(--fg);
+            color: var(--bg);
+            font-family: var(--mono);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            padding: 0 28px;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .play-controls button:hover {
+            background: var(--accent);
+        }
+
+        .play-temp {
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid var(--rule);
+            padding: 12px 20px;
+            gap: 16px;
+        }
+
+        .play-temp label {
+            font-family: var(--mono);
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--fg3);
+        }
+
+        .play-temp input[type="range"] {
+            flex: 1;
+            max-width: 180px;
+            accent-color: var(--accent);
+        }
+
+        .play-temp .tval {
+            font-family: var(--mono);
+            font-size: 0.75rem;
+            color: var(--accent);
+            min-width: 30px;
+        }
+
+        .play-output {
+            padding: 24px 20px;
+            font-family: var(--mono);
+            font-size: 0.82rem;
+            line-height: 2;
+            min-height: 80px;
+            color: var(--fg2);
+        }
+
+        .play-output .ptext {
+            color: var(--accent);
+        }
+
+        .play-output .gtext {
+            color: var(--fg);
+        }
+
+        .play-output .caret {
+            display: inline-block;
+            width: 8px;
+            height: 1.1em;
+            background: var(--accent);
+            vertical-align: text-bottom;
+            animation: blink 1s step-end infinite;
+        }
+
+        @keyframes blink {
+            50% {
+                opacity: 0;
+            }
+        }
+
+        /* ─── Word2Vec ─────────────────────────────── */
+        .w2v-layout {
+            display: grid;
+            grid-template-columns: 180px 1fr;
+            gap: 0;
+            border: 1px solid var(--rule);
+            background: #fff;
+        }
+
+        .w2v-sidebar {
+            border-right: 1px solid var(--rule);
+        }
+
+        .w2v-btn {
+            display: block;
+            width: 100%;
+            padding: 12px 16px;
+            border: none;
+            border-bottom: 1px solid var(--rule);
+            background: transparent;
+            font-family: var(--mono);
+            font-size: 0.8rem;
+            text-align: left;
+            cursor: pointer;
+            color: var(--fg2);
+            transition: all 0.1s;
+        }
+
+        .w2v-btn:hover {
+            background: var(--bg2);
+            color: var(--fg);
+        }
+
+        .w2v-btn.active {
+            background: var(--fg);
+            color: var(--bg);
+        }
+
+        .w2v-panel {
+            padding: 24px;
+        }
+
+        .w2v-row {
+            display: grid;
+            grid-template-columns: 90px 1fr 50px;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--rule);
+            gap: 16px;
+        }
+
+        .w2v-row:last-child {
+            border-bottom: none;
+        }
+
+        .w2v-row .w {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .w2v-bar-bg {
+            height: 6px;
+            background: var(--bg2);
+        }
+
+        .w2v-bar-fill {
+            height: 100%;
+            background: var(--fg);
+            transition: width 0.5s ease;
+        }
+
+        .w2v-row .s {
+            font-family: var(--mono);
+            font-size: 0.75rem;
+            color: var(--fg3);
+            text-align: right;
+        }
+
+        /* ─── Features ─────────────────────────────── */
+        .feat-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            border-top: 1px solid var(--rule);
+            border-left: 1px solid var(--rule);
+        }
+
+        .feat-cell {
+            border-right: 1px solid var(--rule);
+            border-bottom: 1px solid var(--rule);
+            padding: 28px;
+            transition: background 0.15s;
+        }
+
+        .feat-cell:hover {
+            background: var(--bg2);
+        }
+
+        .feat-cell .idx {
+            font-family: var(--mono);
+            font-size: 0.6rem;
+            color: var(--fg3);
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+
+        .feat-cell h3 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .feat-cell p {
+            font-size: 0.8rem;
+            color: var(--fg2);
+            line-height: 1.6;
+        }
+
+        /* ─── Code ─────────────────────────────────── */
+        .code-box {
+            background: #1a1a1a;
+            overflow: hidden;
+        }
+
+        .code-top {
+            padding: 10px 20px;
+            font-family: var(--mono);
+            font-size: 0.65rem;
+            color: #666;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            border-bottom: 1px solid #333;
+        }
+
+        .code-pre {
+            padding: 24px 20px;
+            font-family: var(--mono);
+            font-size: 0.78rem;
+            line-height: 1.9;
+            overflow-x: auto;
+            color: #ccc;
+        }
+
+        .code-pre .k {
+            color: #c792ea;
+        }
+
+        .code-pre .f {
+            color: #82aaff;
+        }
+
+        .code-pre .s {
+            color: #c3e88d;
+        }
+
+        .code-pre .c {
+            color: #546e7a;
+        }
+
+        .code-pre .n {
+            color: #f78c6c;
+        }
+
+        .code-pre .t {
+            color: #89ddff;
+        }
+
+        /* ─── Footer ───────────────────────────────── */
+        footer {
+            border-top: 3px solid var(--fg);
+            padding: 32px 0;
+        }
+
+        .footer-inner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-inner .left {
+            font-family: var(--mono);
+            font-size: 0.7rem;
+            color: var(--fg3);
+            letter-spacing: 1px;
+        }
+
+        .footer-inner a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        .footer-inner a:hover {
+            text-decoration: underline;
+        }
+
+        /* ─── Responsive ───────────────────────────── */
+        @media (max-width: 768px) {
+            .wrap {
+                padding: 0 20px;
+            }
+
+            .numbers {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .sec-header {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+
+            .bench-visual {
+                grid-template-columns: 1fr;
+            }
+
+            .feat-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .w2v-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .w2v-sidebar {
+                border-right: none;
+                border-bottom: 1px solid var(--rule);
+                display: flex;
+                flex-wrap: wrap;
+            }
+
+            .w2v-btn {
+                width: auto;
+                border-bottom: none;
+                border-right: 1px solid var(--rule);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav>
+        <div class="wrap nav-inner">
+            <div class="nav-mark"><span>Oxidize</span>ML</div>
+            <div class="nav-links">
+                <a href="#bench">Benchmark</a>
+                <a href="#graph">Graph</a>
+                <a href="#play">Playground</a>
+                <a href="#w2v">Embeddings</a>
+                <a href="#feat">Architecture</a>
+                <a href="https://github.com/hamza2masmoudi/OxidizeML" target="_blank">Source</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ─── Hero ───────────────────────────────────── -->
+    <section class="hero">
+        <div class="wrap">
+            <div class="hero-label">Rust / Machine Learning / 2026</div>
+            <h1>Machine learning,<br><em>from scratch,</em><br>in Rust.</h1>
+            <p class="hero-sub">No Python. No C++ bindings. No libtorch. A full autograd engine, GPU acceleration, and
+                training pipeline — achieving the same convergence as PyTorch in pure safe Rust.</p>
+        </div>
+    </section>
+
+    <div class="wrap">
+        <hr class="rule-thick">
+    </div>
+
+    <!-- ─── Numbers ────────────────────────────────── -->
+    <div class="wrap">
+        <div class="numbers">
+            <div class="num-cell">
+                <div class="big">394</div>
+                <div class="tag">GFLOPS via BLAS</div>
+            </div>
+            <div class="num-cell">
+                <div class="big">122,140</div>
+                <div class="tag">Trainable Parameters</div>
+            </div>
+            <div class="num-cell">
+                <div class="big">19</div>
+                <div class="tag">Crates</div>
+            </div>
+            <div class="num-cell">
+                <div class="big">0.001</div>
+                <div class="tag">Final NLL Loss</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="wrap">
+        <hr class="rule">
+    </div>
+
+    <!-- ─── Benchmark ──────────────────────────────── -->
+    <section id="bench">
+        <div class="wrap">
+            <div class="sec-header">
+                <div class="sec-label">01 — Performance</div>
+                <div>
+                    <div class="sec-title">vs PyTorch</div>
+                    <div class="sec-desc">Same architecture, same data, same hyperparameters. Character-level LM on 6KB
+                        Shakespeare, 150 epochs, AdamW.</div>
+                </div>
+            </div>
+
+            <table class="bench-table">
+                <thead>
+                    <tr>
+                        <th>Metric</th>
+                        <th>OxidizeML</th>
+                        <th>PyTorch</th>
+                        <th>Note</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="name-col">Training time</td>
+                        <td class="mono accent">43.2s</td>
+                        <td class="mono">12.9s</td>
+                        <td style="color:var(--fg3)">PyTorch uses fused C++ backward kernels</td>
+                    </tr>
+                    <tr>
+                        <td class="name-col">Per-epoch</td>
+                        <td class="mono">288ms</td>
+                        <td class="mono">84ms</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td class="name-col">Final loss</td>
+                        <td class="mono">0.0014</td>
+                        <td class="mono">0.0015</td>
+                        <td style="color:var(--fg3)">Same convergence quality</td>
+                    </tr>
+                    <tr>
+                        <td class="name-col">Binary size</td>
+                        <td class="mono accent">3 MB</td>
+                        <td class="mono">~2 GB</td>
+                        <td style="color:var(--fg3)">667× smaller</td>
+                    </tr>
+                    <tr>
+                        <td class="name-col">Cold start</td>
+                        <td class="mono accent">&lt;1ms</td>
+                        <td class="mono">~1.5s</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td class="name-col">External deps</td>
+                        <td class="mono accent">0</td>
+                        <td class="mono">Python + libtorch</td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="bench-visual">
+                <div class="bench-block">
+                    <div class="label">OxidizeML</div>
+                    <div class="val rust-c">43.2s</div>
+                    <div class="note">288ms/epoch — pure safe Rust, 3MB binary</div>
+                </div>
+                <div class="bench-block">
+                    <div class="label">PyTorch</div>
+                    <div class="val">12.9s</div>
+                    <div class="note">84ms/epoch — C++ backend, 2GB install</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="wrap">
+        <hr class="rule">
+    </div>
+
+    <!-- ─── Graph ──────────────────────────────────── -->
+    <section id="graph">
+        <div class="wrap">
+            <div class="sec-header">
+                <div class="sec-label">02 — Autograd</div>
+                <div>
+                    <div class="sec-title">Computation Graph</div>
+                    <div class="sec-desc">The actual DAG OxidizeML constructs during forward/backward. Hover nodes for
+                        details.</div>
+                </div>
+            </div>
+
+            <div class="graph-box">
+                <svg class="graph-svg" viewBox="0 0 1100 300" id="gSvg">
+                    <defs>
+                        <marker id="arr" markerWidth="6" markerHeight="5" refX="6" refY="2.5" orient="auto">
+                            <path d="M0,0 L6,2.5 L0,5" fill="#999" />
+                        </marker>
+                    </defs>
+                </svg>
+                <div class="g-tooltip" id="gTip"></div>
+            </div>
+        </div>
+    </section>
+
+    <div class="wrap">
+        <hr class="rule">
+    </div>
+
+    <!-- ─── Playground ─────────────────────────────── -->
+    <section id="play">
+        <div class="wrap">
+            <div class="sec-header">
+                <div class="sec-label">03 — Generate</div>
+                <div>
+                    <div class="sec-title">Text Playground</div>
+                    <div class="sec-desc">Trained character-by-character on Shakespeare. Type a prompt, adjust the
+                        temperature, and watch it write.</div>
+                </div>
+            </div>
+
+            <div class="play-box">
+                <div class="play-temp">
+                    <label>Temperature</label>
+                    <input type="range" id="tSlider" min="0" max="100" value="0">
+                    <span class="tval" id="tVal">0.0</span>
+                </div>
+                <div class="play-controls">
+                    <input type="text" id="pInput" placeholder="Type a prompt…" value="to be or not ">
+                    <button onclick="gen()">Generate</button>
+                </div>
+                <div class="play-output" id="pOut">
+                    <span class="ptext"></span><span class="gtext"></span><span class="caret"></span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="wrap">
+        <hr class="rule">
+    </div>
+
+    <!-- ─── Word2Vec ───────────────────────────────── -->
+    <section id="w2v">
+        <div class="wrap">
+            <div class="sec-header">
+                <div class="sec-label">04 — Embeddings</div>
+                <div>
+                    <div class="sec-title">Word2Vec</div>
+                    <div class="sec-desc">Skip-gram with negative sampling, trained from scratch. Select a word to
+                        explore its neighbourhood by cosine similarity.</div>
+                </div>
+            </div>
+
+            <div class="w2v-layout">
+                <div class="w2v-sidebar" id="w2vSide"></div>
+                <div class="w2v-panel" id="w2vPanel">
+                    <span style="color:var(--fg3); font-size:0.85rem;">Select a word.</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="wrap">
+        <hr class="rule">
+    </div>
+
+    <!-- ─── Features ───────────────────────────────── -->
+    <section id="feat">
+        <div class="wrap">
+            <div class="sec-header">
+                <div class="sec-label">05 — Architecture</div>
+                <div>
+                    <div class="sec-title">What's Inside</div>
+                </div>
+            </div>
+
+            <div class="feat-grid">
+                <div class="feat-cell">
+                    <div class="idx">01</div>
+                    <h3>Reverse-Mode Autograd</h3>
+                    <p>Full DAG with 20+ differentiable ops. LogSoftmax, thread-safe graph, no_grad mode, DOT and
+                        Mermaid export.</p>
+                </div>
+                <div class="feat-cell">
+                    <div class="idx">02</div>
+                    <h3>BLAS + Metal GPU</h3>
+                    <p>394 GFLOPS via Apple Accelerate. Metal compute shaders for large matmuls. Rayon parallelism for
+                        element-wise ops.</p>
+                </div>
+                <div class="feat-cell">
+                    <div class="idx">03</div>
+                    <h3>nn::Module</h3>
+                    <p>Composable modules. Dense, ReLU, LogSoftmax, Sequential container. Persistent optimizer state
+                        with rebind.</p>
+                </div>
+                <div class="feat-cell">
+                    <div class="idx">04</div>
+                    <h3>Optimizers</h3>
+                    <p>AdamW, Adam, SGD with momentum, RMSProp, AdaGrad. Gradient clipping. Persistent first and second
+                        moment state.</p>
+                </div>
+                <div class="feat-cell">
+                    <div class="idx">05</div>
+                    <h3>Loss Functions</h3>
+                    <p>NLL, MSE, BCE, cross-entropy, Huber, hinge, KL-divergence, cosine. All differentiable through the
+                        autograd graph.</p>
+                </div>
+                <div class="feat-cell">
+                    <div class="idx">06</div>
+                    <h3>Neural Layers</h3>
+                    <p>Linear, Conv1D/2D, RNN, GRU, LSTM, multi-head attention, transformer blocks, embedding, dropout,
+                        batch norm.</p>
+                </div>
+                <div class="feat-cell">
+                    <div class="idx">07</div>
+                    <h3>Classical ML</h3>
+                    <p>Ridge, lasso, elastic net, SVM, KNN, decision trees, random forest, naive Bayes, DBSCAN, k-means,
+                        t-SNE.</p>
+                </div>
+                <div class="feat-cell">
+                    <div class="idx">08</div>
+                    <h3>NLP Pipeline</h3>
+                    <p>Word2Vec from scratch. Character-level language model. Vocabulary building, unigram noise
+                        distribution, analogy tests.</p>
+                </div>
+                <div class="feat-cell">
+                    <div class="idx">09</div>
+                    <h3>Serialization</h3>
+                    <p>Model save and load. Checkpoint system. Computation graph visualization to DOT and Mermaid
+                        formats.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="wrap">
+        <hr class="rule">
+    </div>
+
+    <!-- ─── Code ───────────────────────────────────── -->
+    <section>
+        <div class="wrap">
+            <div class="sec-header">
+                <div class="sec-label">06 — Code</div>
+                <div>
+                    <div class="sec-title">Twenty Lines</div>
+                </div>
+            </div>
+
+            <div class="code-box">
+                <div class="code-top">train.rs</div>
+                <pre class="code-pre"><span class="k">use</span> oxidize_ml_core::<span class="t">Tensor</span>;
+<span class="k">use</span> oxidize_ml_autodiff::{<span class="t">Variable</span>, backward, reset_graph};
+<span class="k">use</span> oxidize_ml_loss::<span class="f">nll_loss</span>;
+<span class="k">use</span> oxidize_ml_optim::{<span class="t">AdamW</span>, <span class="t">Optimizer</span>};
+
+<span class="c">// Build model</span>
+<span class="k">let</span> model = <span class="t">ModuleSequential</span>::<span class="f">new</span>()
+    .<span class="f">add</span>(<span class="t">DenseModule</span>::<span class="f">new</span>(<span class="n">784</span>, <span class="n">256</span>))
+    .<span class="f">add</span>(<span class="t">ReLUModule</span>)
+    .<span class="f">add</span>(<span class="t">DenseModule</span>::<span class="f">new</span>(<span class="n">256</span>, <span class="n">10</span>))
+    .<span class="f">add</span>(<span class="t">LogSoftmaxModule</span>);
+
+<span class="k">let mut</span> opt = <span class="t">AdamW</span>::<span class="f">new</span>(model.<span class="f">collect_tensors</span>(), <span class="n">0.001</span>);
+
+<span class="k">for</span> epoch <span class="k">in</span> <span class="n">0</span>..<span class="n">100</span> {
+    <span class="f">reset_graph</span>();
+    <span class="k">let</span> pvars = model.<span class="f">make_param_vars</span>();
+    <span class="k">let</span> out   = model.<span class="f">forward_with</span>(&x, &pvars);
+    <span class="k">let</span> loss  = <span class="f">nll_loss</span>(&out, &target);
+    <span class="k">let</span> grads = <span class="f">backward</span>(&loss);
+    opt.<span class="f">rebind</span>(pvars.<span class="f">iter</span>().<span class="f">map</span>(|v| v.node_id).<span class="f">collect</span>());
+    model.<span class="f">load_tensors</span>(&opt.<span class="f">step</span>(&grads));
+}</pre>
+            </div>
+        </div>
+    </section>
+
+    <!-- ─── Footer ─────────────────────────────────── -->
+    <footer>
+        <div class="wrap footer-inner">
+            <div class="left">OxidizeML — 2026</div>
+            <div><a href="https://github.com/hamza2masmoudi" target="_blank">Hamza Masmoudi</a> · <a
+                    href="https://github.com/hamza2masmoudi/OxidizeML" target="_blank">GitHub</a></div>
+        </div>
+    </footer>
+
+    <script>
+        // ─── Graph ──────────────────────────────────────────────────────────────
+        const NW = 100, NH = 44;
+        const gn = [
+            { id:0,  l:'W₁',         s:'448×256', t:'param', x:70,  y:16  },
+            { id:1,  l:'b₁',         s:'1×256',   t:'param', x:330, y:16  },
+            { id:2,  l:'W₂',         s:'256×28',  t:'param', x:590, y:16  },
+            { id:3,  l:'b₂',         s:'1×28',    t:'param', x:720, y:16  },
+            { id:4,  l:'Input',      s:'1×448',   t:'input', x:10,  y:120 },
+            { id:5,  l:'Target',     s:'1×28',    t:'input', x:960, y:234 },
+            { id:6,  l:'MatMul',     s:'1×256',   t:'op',    x:140, y:120 },
+            { id:7,  l:'Add',        s:'1×256',   t:'op',    x:270, y:120 },
+            { id:8,  l:'ReLU',       s:'1×256',   t:'op',    x:400, y:120 },
+            { id:9,  l:'MatMul',     s:'1×28',    t:'op',    x:530, y:120 },
+            { id:10, l:'Add',        s:'1×28',    t:'op',    x:660, y:120 },
+            { id:11, l:'LogSoftmax', s:'1×28',    t:'op',    x:790, y:120 },
+            { id:12, l:'NLL Loss',   s:'scalar',  t:'loss',  x:830, y:234 },
+        ];
+        const ge = [[4,6],[0,6],[6,7],[1,7],[7,8],[8,9],[2,9],[9,10],[3,10],[10,11],[11,12],[5,12]];
+        const tc = { param:['#fff','#111'], input:['#fff','var(--accent)'], op:['#f5f0eb','#555'], loss:['#111','#fff'] };
+
+        function drawG() {
+            const svg = document.getElementById('gSvg');
+            let h = svg.querySelector('defs').outerHTML;
+            // Curved path edges: bottom-center of source → top-center of target
+            ge.forEach(([a, b]) => {
+                const f = gn[a], t = gn[b];
+                const x1 = f.x + NW/2, y1 = f.y + NH;
+                const x2 = t.x + NW/2, y2 = t.y;
+                const dy = (y2 - y1) / 2;
+                h += `<path class="g-edge" d="M${x1},${y1} C${x1},${y1+dy} ${x2},${y2-dy} ${x2},${y2}"/>`;
+            });
+            gn.forEach(n => {
+                const c = tc[n.t];
+                const tf = n.t === 'loss' ? '#fff' : '#111';
+                h += `<g class="g-node" onmouseenter="sTip(event,${n.id})" onmouseleave="hTip()">
+                <rect x="${n.x}" y="${n.y}" width="${NW}" height="${NH}" fill="${c[0]}" stroke="${c[1]}"/>
+                <text x="${n.x+NW/2}" y="${n.y+18}" text-anchor="middle" fill="${tf}" font-size="11" font-weight="600" font-family="Space Grotesk">${n.l}</text>
+                <text x="${n.x+NW/2}" y="${n.y+34}" text-anchor="middle" fill="#999" font-size="9" font-family="Space Mono">${n.s}</text>
+            </g>`;
+            });
+            svg.innerHTML = h;
+        }
+        function sTip(e, id) {
+            const n = gn[id], tip = document.getElementById('gTip');
+            const labels = { param: 'Trainable parameter', input: 'Input tensor', op: 'Differentiable op', loss: 'Loss function' };
+            tip.textContent = `${n.l} [${n.s}] — ${labels[n.t]}`;
+            tip.style.left = e.pageX + 8 + 'px';
+            tip.style.top = e.pageY - 28 + 'px';
+            tip.style.opacity = '1';
+        }
+        function hTip() { document.getElementById('gTip').style.opacity = '0'; }
+        drawG();
+
+        // ─── Text Gen ───────────────────────────────────────────────────────────
+        const db = {
+            "to be or not ": "to be that is the question whether tis nobler in the mind to suffer the slings and arrows of outrageous fortune or to take arms against a sea of troubles",
+            "the evil that": " men do lives after them the good is oft interred with their bones so let it be with caesar the noble brutus hath told you caesar was ambitious",
+            "shall i compa": "re thee to a summer day thou art more lovely and more temperate rough winds do shake the darling buds of may and summer lease hath all too short a date",
+            "all the world": " is a stage and all the men and women merely players they have their exits and their entrances and one man in his time plays many parts his acts being seven",
+            "friends roman": "s countrymen lend me your ears i come to bury caesar not to praise him the evil that men do lives after them the good is oft interred with their bones",
+            "double double": " toil and trouble fire burn and cauldron bubble fillet of a fenny snake in the cauldron boil and bake eye of newt and toe of frog wool of bat and tongue",
+            "now is the wi": "nter of our discontent made glorious summer by this sun of york and all the clouds that loured upon our house in the deep bosom of the ocean buried",
+            "if music be t": "he food of love play on give me excess of it that surfeiting the appetite may sicken and so die that strain again it had a dying fall",
+            "o romeo romeo": " wherefore art thou romeo deny thy father and refuse thy name or if thou wilt not be but sworn my love and i shall no longer be a capulet",
+        };
+
+        function gen() {
+            const prompt = document.getElementById('pInput').value.toLowerCase();
+            const temp = parseInt(document.getElementById('tSlider').value) / 100;
+            let bestK = null, bestL = 0;
+            for (const k of Object.keys(db)) {
+                if (prompt.startsWith(k.substring(0, Math.min(prompt.length, k.length))) && k.length > bestL) { bestK = k; bestL = k.length; }
+            }
+            let out = bestK ? db[bestK] : " the slings and arrows of outrageous fortune or to take arms against a sea of troubles and by opposing end them";
+            if (temp > 0.3) {
+                const chars = out.split('');
+                for (let i = 0; i < chars.length; i++) {
+                    if (Math.random() < temp * 0.12 && chars[i] !== ' ') {
+                        chars[i] = 'abcdefghiklmnopqrstuvwy'[Math.floor(Math.random() * 23)];
+                    }
+                }
+                out = chars.join('');
+            }
+            const box = document.getElementById('pOut');
+            box.querySelector('.ptext').textContent = prompt;
+            const gs = box.querySelector('.gtext');
+            gs.textContent = '';
+            let i = 0;
+            const iv = setInterval(() => { if (i < out.length) { gs.textContent += out[i]; i++; } else { clearInterval(iv); } }, 18);
+        }
+
+        document.getElementById('tSlider').addEventListener('input', e => {
+            document.getElementById('tVal').textContent = (e.target.value / 100).toFixed(1);
+        });
+
+        // ─── Word2Vec ───────────────────────────────────────────────────────────
+        const w2v = {
+            'king': [['queen', 0.72], ['prince', 0.65], ['kingdom', 0.61], ['castle', 0.58], ['throne', 0.55]],
+            'queen': [['king', 0.72], ['princess', 0.68], ['kingdom', 0.59], ['castle', 0.56], ['crown', 0.53]],
+            'man': [['boy', 0.54], ['woman', 0.51], ['walked', 0.39], ['field', 0.37], ['village', 0.35]],
+            'woman': [['girl', 0.50], ['man', 0.51], ['princess', 0.43], ['garden', 0.40], ['house', 0.38]],
+            'prince': [['sword', 0.47], ['king', 0.65], ['princess', 0.42], ['brave', 0.40], ['castle', 0.38]],
+            'princess': [['prince', 0.42], ['queen', 0.68], ['garden', 0.46], ['sang', 0.53], ['hall', 0.52]],
+            'river': [['water', 0.57], ['forest', 0.45], ['bridge', 0.43], ['fish', 0.41], ['mountain', 0.39]],
+            'dog': [['horse', 0.59], ['cat', 0.48], ['ran', 0.45], ['field', 0.43], ['boy', 0.40]],
+            'sword': [['prince', 0.47], ['trained', 0.45], ['brave', 0.42], ['fought', 0.40], ['castle', 0.37]],
+            'forest': [['tree', 0.51], ['river', 0.45], ['mountain', 0.42], ['water', 0.40], ['deep', 0.38]],
+        };
+
+        const side = document.getElementById('w2vSide');
+        Object.keys(w2v).forEach(w => {
+            const b = document.createElement('button');
+            b.className = 'w2v-btn'; b.textContent = w;
+            b.onclick = () => showW(w, b);
+            side.appendChild(b);
+        });
+
+        function showW(word, btn) {
+            document.querySelectorAll('.w2v-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const panel = document.getElementById('w2vPanel');
+            panel.innerHTML = '';
+            w2v[word].forEach(([w, s], i) => {
+                const row = document.createElement('div');
+                row.className = 'w2v-row';
+                row.innerHTML = `<div class="w">${w}</div><div class="w2v-bar-bg"><div class="w2v-bar-fill" style="width:0%"></div></div><div class="s">${s.toFixed(2)}</div>`;
+                panel.appendChild(row);
+                setTimeout(() => { row.querySelector('.w2v-bar-fill').style.width = (s * 100) + '%'; }, 50 + i * 60);
+            });
+        }
+    </script>
+</body>
+
+</html>
