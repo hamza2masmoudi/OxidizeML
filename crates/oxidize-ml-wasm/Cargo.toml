@@ -1,0 +1,21 @@
+[package]
+name = "oxidize-ml-wasm"
+version = "0.1.0"
+edition = "2021"
+description = "WASM bindings for OxidizeML — runs ML inference in the browser"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+wasm-bindgen = "0.2"
+serde = { workspace = true }
+serde_json = { workspace = true }
+oxidize-ml-core = { path = "../oxidize-ml-core" }
+oxidize-ml-autodiff = { path = "../oxidize-ml-autodiff" }
+oxidize-ml-nn = { path = "../oxidize-ml-nn" }
+oxidize-ml-optim = { path = "../oxidize-ml-optim" }
+oxidize-ml-loss = { path = "../oxidize-ml-loss" }
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+getrandom = { version = "0.2", features = ["js"] }

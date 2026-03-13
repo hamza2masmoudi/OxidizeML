@@ -8,3 +8,14 @@ description = "Core tensor engine for OxidizeML"
 rand = { workspace = true }
 thiserror = { workspace = true }
 serde = { workspace = true }
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+rayon = { workspace = true }
+
+[target.'cfg(target_os = "macos")'.dependencies]
+accelerate-src = "0.3"
+metal = "0.29"
+objc = "0.2"
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+getrandom = { version = "0.2", features = ["js"] }

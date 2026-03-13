@@ -5,6 +5,8 @@ use crate::shape::Shape;
 use rand::distributions::{Distribution, Standard};
 use rand::rngs::StdRng;
 use rand::SeedableRng;
+#[cfg(not(target_arch = "wasm32"))]
+use rayon::prelude::*;
 use serde::{Deserialize, Serialize};
 use std::fmt;
 use std::ops;
@@ -490,14 +492,36 @@ impl<T: Float> Tensor<T> {
 
     // ─── Element-wise Unary Operations ──────────────────────────────────────
 
-    pub fn apply<F: Fn(T) -> T>(&self, f: F) -> Tensor<T> {
-        Tensor {
-            data: self.data.iter().map(|&x| f(x)).collect(),
-            shape: self.shape.clone(),
-        }
+    /// Minimum number of elements before parallelizing with rayon.
+    /// Below this threshold, the threading overhead exceeds the benefit.
+    const PAR_THRESHOLD: usize = 4096;
+
+    pub fn apply<F: Fn(T) -> T + Send + Sync>(&self, f: F) -> Tensor<T> {
+        let data = {
+            #[cfg(not(target_arch = "wasm32"))]
+            {
+                if self.numel() >= Self::PAR_THRESHOLD {
+                    self.data.par_iter().map(|&x| f(x)).collect()
+                } else {
+                    self.data.iter().map(|&x| f(x)).collect()
+                }
+            }
+            #[cfg(target_arch = "wasm32")]
+            {
+                self.data.iter().map(|&x| f(x)).collect()
+            }
+        };
+        Tensor { data, shape: self.shape.clone() }
     }
 
-    pub fn apply_mut<F: Fn(T) -> T>(&mut self, f: F) {
+    pub fn apply_mut<F: Fn(T) -> T + Send + Sync>(&mut self, f: F) {
+        #[cfg(not(target_arch = "wasm32"))]
+        {
+            if self.numel() >= Self::PAR_THRESHOLD {
+                self.data.par_iter_mut().for_each(|x| *x = f(*x));
+                return;
+            }
+        }
         for x in self.data.iter_mut() {
             *x = f(*x);
         }
@@ -537,6 +561,98 @@ impl<T: Float> Tensor<T> {
     /// Sigmoid activation: 1 / (1 + exp(-x)).
     pub fn sigmoid(&self) -> Tensor<T> {
         self.apply(|x| T::ONE / (T::ONE + (-x).exp()))
+    }
+
+    /// Softmax along the last axis: exp(x_i) / Σ exp(x_j).
+    ///
+    /// Numerically stable: subtracts the row-max before exponentiating.
+    pub fn softmax_last_axis(&self) -> Tensor<T> {
+        if self.ndim() < 1 {
+            return self.clone();
+        }
+        let dims = self.shape.dims();
+        let last_dim = *dims.last().unwrap();
+        let outer: usize = self.numel() / last_dim;
+        let mut data = self.data.clone();
+
+        for o in 0..outer {
+            let start = o * last_dim;
+            let end = start + last_dim;
+            let row = &self.data[start..end];
+
+            // Numerical stability: subtract max
+            let max_val = row.iter().copied().fold(T::NEG_INFINITY, T::max);
+            let mut sum = T::ZERO;
+            for i in start..end {
+                data[i] = (self.data[i] - max_val).exp();
+                sum = sum + data[i];
+            }
+            for i in start..end {
+                data[i] = data[i] / sum;
+            }
+        }
+
+        Tensor { data, shape: self.shape.clone() }
+    }
+
+    /// LogSoftmax along the last axis: log(softmax(x)).
+    ///
+    /// Numerically stable: x_i - max(x) - log(Σ exp(x_j - max(x))).
+    /// This fused formula avoids computing softmax → log (which loses precision).
+    pub fn log_softmax_last_axis(&self) -> Tensor<T> {
+        if self.ndim() < 1 {
+            return self.clone();
+        }
+        let dims = self.shape.dims();
+        let last_dim = *dims.last().unwrap();
+        let outer: usize = self.numel() / last_dim;
+        let mut data = self.data.clone();
+
+        for o in 0..outer {
+            let start = o * last_dim;
+            let end = start + last_dim;
+            let row = &self.data[start..end];
+
+            // Numerical stability: subtract max
+            let max_val = row.iter().copied().fold(T::NEG_INFINITY, T::max);
+            let mut log_sum_exp = T::ZERO;
+            for &val in row {
+                log_sum_exp = log_sum_exp + (val - max_val).exp();
+            }
+            let log_sum_exp = log_sum_exp.ln();
+
+            // log_softmax_i = x_i - max - log_sum_exp
+            for i in start..end {
+                data[i] = self.data[i] - max_val - log_sum_exp;
+            }
+        }
+
+        Tensor { data, shape: self.shape.clone() }
+    }
+
+    /// Slice along the outermost (batch) dimension: returns data[start..end, ..].
+    ///
+    /// Works for any dimensionality ≥ 1.
+    pub fn slice(&self, start: usize, end: usize) -> TensorResult<Tensor<T>> {
+        let dims = self.shape.dims();
+        if dims.is_empty() {
+            return Err(TensorError::InvalidOperation(
+                "Cannot slice a scalar tensor".to_string(),
+            ));
+        }
+        let outer = dims[0];
+        if start >= outer || end > outer || start >= end {
+            return Err(TensorError::IndexOutOfBounds {
+                index: end,
+                axis: 0,
+                size: outer,
+            });
+        }
+        let inner: usize = dims[1..].iter().product();
+        let data = self.data[start * inner..end * inner].to_vec();
+        let mut new_dims = dims.to_vec();
+        new_dims[0] = end - start;
+        Tensor::new(data, new_dims)
     }
 
     // ─── Scalar Operations ──────────────────────────────────────────────────
@@ -902,6 +1018,9 @@ impl<T: Float> Tensor<T> {
     }
 
     /// Matrix multiply: supports 2D×2D and batched.
+    ///
+    /// Uses BLAS (Apple Accelerate on macOS) for hardware acceleration.
+    /// On M-series Macs, this routes through the AMX coprocessor.
     pub fn matmul(&self, other: &Tensor<T>) -> TensorResult<Tensor<T>> {
         if self.ndim() < 2 || other.ndim() < 2 {
             return Err(TensorError::InvalidOperation(
@@ -924,21 +1043,22 @@ impl<T: Float> Tensor<T> {
         }
 
         if self.ndim() == 2 && other.ndim() == 2 {
-            // Standard 2D matmul
-            let mut data = vec![T::ZERO; m * n];
-            for i in 0..m {
-                for j in 0..n {
-                    let mut sum = T::ZERO;
-                    for p in 0..k {
-                        sum = sum + self.data[i * k + p] * other.data[p * n + j];
+            // Try GPU for large matrices, fall back to CPU BLAS
+            #[cfg(target_os = "macos")]
+            {
+                if crate::metal_backend::gpu::should_use_gpu(m, n, k) {
+                    if let Some(result) = T::gpu_gemm(&self.data, &other.data, m, k, n) {
+                        return Tensor::new(result, vec![m, n]);
                     }
-                    data[i * n + j] = sum;
                 }
             }
+            // CPU BLAS fallback
+            let mut data = vec![T::ZERO; m * n];
+            T::blas_gemm(&self.data, &other.data, &mut data, m, n, k);
             return Tensor::new(data, vec![m, n]);
         }
 
-        // Batched matmul
+        // Batched matmul — one BLAS call per batch slice
         let batch_a: usize = a_dims[..a_dims.len() - 2].iter().product();
         let batch_b: usize = b_dims[..b_dims.len() - 2].iter().product();
         let batch = batch_a.max(batch_b);
@@ -953,17 +1073,12 @@ impl<T: Float> Tensor<T> {
             let b_off = if batch_b == 1 { 0 } else { b_idx * b_mat };
             let c_off = b_idx * c_mat;
 
-            for i in 0..m {
-                for j in 0..n {
-                    let mut sum = T::ZERO;
-                    for p in 0..k {
-                        sum = sum
-                            + self.data[a_off + i * k + p]
-                                * other.data[b_off + p * n + j];
-                    }
-                    data[c_off + i * n + j] = sum;
-                }
-            }
+            T::blas_gemm(
+                &self.data[a_off..a_off + a_mat],
+                &other.data[b_off..b_off + b_mat],
+                &mut data[c_off..c_off + c_mat],
+                m, n, k,
+            );
         }
 
         let mut out_shape = if batch_a > batch_b {

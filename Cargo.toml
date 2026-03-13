@@ -20,6 +20,8 @@ members = [
     "crates/oxidize-ml-io",
     "crates/oxidize-ml-datasets",
     "crates/oxidize-ml-pipeline",
+    "crates/oxidize-ml-wasm",
+    "examples",
 ]
 
 [workspace.dependencies]
